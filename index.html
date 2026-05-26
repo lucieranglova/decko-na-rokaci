@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Déčko na Rokači</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Nunito:wght@700;900;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --fire: #ff2200;
+    --gold: #ffd000;
+    --dark: #080808;
+    --mid: #161616;
+    --smoke: #252525;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--dark);
+    color: #f0f0f0;
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::after {
+    content:'';
+    position:fixed; inset:0;
+    background:
+      radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255,34,0,0.13) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 30% at 10% 100%, rgba(255,100,0,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 30% at 90% 100%, rgba(255,208,0,0.06) 0%, transparent 60%);
+    pointer-events:none; z-index:0;
+    animation: bgp 6s ease-in-out infinite alternate;
+  }
+  @keyframes bgp { 0%{opacity:.7} 100%{opacity:1} }
+
+  .beams {
+    position:fixed; top:0; left:0; right:0; height:55vh;
+    pointer-events:none; z-index:1; overflow:hidden;
+  }
+  .beam {
+    position:absolute; top:0;
+    width:0; height:0; border-style:solid;
+    transform-origin:top center;
+  }
+  .beam:nth-child(1){ left:7%;  border-width:0 55px 55vh 55px; border-color:transparent transparent rgba(255,34,0,0.07) transparent; animation:sw 2.8s ease-in-out infinite; }
+  .beam:nth-child(2){ left:24%; border-width:0 45px 50vh 45px; border-color:transparent transparent rgba(255,208,0,0.05) transparent; animation:sw 3.5s ease-in-out infinite .4s; }
+  .beam:nth-child(3){ left:48%; border-width:0 60px 58vh 60px; border-color:transparent transparent rgba(255,100,0,0.07) transparent; animation:sw 3.1s ease-in-out infinite .9s; }
+  .beam:nth-child(4){ left:71%; border-width:0 45px 50vh 45px; border-color:transparent transparent rgba(255,208,0,0.05) transparent; animation:sw 2.6s ease-in-out infinite 1.3s; }
+  .beam:nth-child(5){ left:89%; border-width:0 50px 55vh 50px; border-color:transparent transparent rgba(255,34,0,0.06) transparent; animation:sw 3.3s ease-in-out infinite .6s; }
+  @keyframes sw { 0%,100%{transform:rotate(-18deg)} 50%{transform:rotate(18deg)} }
+
+  .emoji-rain { position:fixed; top:0; left:0; right:0; pointer-events:none; z-index:50; }
+  .falling-emoji { position:absolute; top:-50px; animation:fall linear forwards; }
+  @keyframes fall { 0%{transform:translateY(0) rotate(0deg);opacity:.9} 100%{transform:translateY(110vh) rotate(400deg);opacity:0} }
+
+  .container {
+    position:relative; z-index:10;
+    min-height:100vh;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    padding:40px 20px 60px;
+  }
+
+  .badge {
+    background: var(--fire);
+    color:#fff;
+    font-family:'Nunito', sans-serif;
+    font-weight:900;
+    font-size:12px;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    padding:6px 18px;
+    border-radius:3px;
+    margin-bottom:28px;
+    animation:badgep 2s ease-in-out infinite;
+  }
+  @keyframes badgep {
+    0%,100%{box-shadow:0 0 20px rgba(255,34,0,.4)}
+    50%{box-shadow:0 0 44px rgba(255,34,0,.9),0 0 80px rgba(255,34,0,.3)}
+  }
+
+  .headline {
+    text-align:center;
+    line-height:1;
+    margin-bottom:6px;
+  }
+  .headline .decko {
+    display:block;
+    font-family:'Oswald', sans-serif;
+    font-weight:700;
+    font-size:clamp(64px,18vw,160px);
+    color:var(--gold);
+    text-shadow:5px 5px 0 #000, 0 0 60px rgba(255,208,0,.35);
+    letter-spacing:2px;
+    animation:flicker 5s ease-in-out infinite;
+  }
+  .headline .na {
+    display:block;
+    font-family:'Nunito', sans-serif;
+    font-weight:900;
+    font-size:clamp(16px,3.5vw,30px);
+    color:#666;
+    letter-spacing:10px;
+    text-transform:uppercase;
+    margin:4px 0;
+  }
+  .headline .rokaci {
+    display:block;
+    font-family:'Oswald', sans-serif;
+    font-weight:700;
+    font-size:clamp(50px,13vw,128px);
+    color:#fff;
+    text-shadow:4px 4px 0 #1a1a1a;
+    letter-spacing:2px;
+  }
+  @keyframes flicker {
+    0%,93%,100%{opacity:1}
+    94%{opacity:.75} 95%{opacity:1} 97%{opacity:.5} 98%{opacity:1}
+  }
+
+  .za {
+    font-family:'Nunito', sans-serif;
+    font-weight:900;
+    font-size:clamp(20px,4.5vw,40px);
+    color:var(--fire);
+    letter-spacing:6px;
+    margin:22px 0 16px;
+    text-shadow:0 0 20px rgba(255,34,0,.5);
+  }
+
+  .countdown-grid {
+    display:flex;
+    gap:clamp(6px,1.8vw,18px);
+    align-items:center;
+    justify-content:center;
+    flex-wrap:nowrap;
+    margin-bottom:32px;
+  }
+  .unit { display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .box {
+    background:var(--mid);
+    border:1px solid #2a2a2a;
+    border-bottom:3px solid var(--fire);
+    width:clamp(64px,14vw,128px);
+    height:clamp(74px,16vw,146px);
+    display:flex; align-items:center; justify-content:center;
+    position:relative; overflow:hidden; border-radius:4px;
+  }
+  .box::after {
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(180deg,rgba(255,255,255,.04) 0%,transparent 50%,rgba(0,0,0,.25) 100%);
+    pointer-events:none;
+  }
+  .box::before {
+    content:''; position:absolute; top:50%; left:0; right:0; height:1px;
+    background:rgba(255,255,255,.05);
+  }
+  .num {
+    font-family:'Oswald', sans-serif;
+    font-weight:700;
+    font-size:clamp(38px,9.5vw,92px);
+    color:#fff;
+    text-shadow:0 0 20px rgba(255,208,0,.2);
+    position:relative; z-index:1; line-height:1;
+  }
+  .num.tick { animation:ticka .18s ease; }
+  @keyframes ticka {
+    0%{transform:scale(1.14);color:var(--gold)}
+    100%{transform:scale(1);color:#fff}
+  }
+  .lbl {
+    font-family:'Nunito', sans-serif;
+    font-weight:700;
+    font-size:clamp(10px,1.8vw,14px);
+    letter-spacing:3px;
+    color:#404040;
+    text-transform:uppercase;
+  }
+  .sep {
+    font-family:'Oswald', sans-serif;
+    font-size:clamp(38px,8vw,86px);
+    color:var(--fire);
+    line-height:1;
+    margin-bottom:18px;
+    animation:blink 1s step-start infinite;
+    user-select:none;
+  }
+  @keyframes blink { 0%,49%{opacity:1} 50%,100%{opacity:.15} }
+
+  .fun-msg {
+    font-family:'Nunito', sans-serif;
+    font-weight:800;
+    font-size:clamp(15px,2.8vw,20px);
+    color:var(--gold);
+    text-align:center;
+    max-width:520px;
+    min-height:54px;
+    display:flex; align-items:center; justify-content:center;
+    padding:0 20px;
+    margin-bottom:24px;
+    transition:opacity .4s;
+    line-height:1.4;
+  }
+
+  .medicalc-box {
+    background:rgba(255,208,0,.05);
+    border:1px solid rgba(255,208,0,.18);
+    border-radius:10px;
+    padding:14px 24px;
+    max-width:460px;
+    width:90vw;
+    text-align:center;
+    margin-bottom:28px;
+    position:relative;
+    overflow:hidden;
+  }
+  .medicalc-box::before {
+    content:'😂';
+    position:absolute;
+    font-size:80px; opacity:.07;
+    right:-8px; top:-8px;
+  }
+  .medicalc-tag {
+    font-family:'Nunito', sans-serif;
+    font-weight:900;
+    font-size:10px;
+    letter-spacing:4px;
+    color:#444;
+    text-transform:uppercase;
+    margin-bottom:6px;
+  }
+  .medicalc-text {
+    font-family:'Nunito', sans-serif;
+    font-weight:700;
+    font-size:clamp(14px,2.4vw,17px);
+    color:var(--gold);
+    line-height:1.5;
+  }
+  .medicalc-text strong { color:var(--fire); font-weight:900; }
+
+  .progress-wrap {
+    width:min(460px,90vw);
+    background:var(--smoke);
+    height:6px; border-radius:3px; overflow:hidden; margin-bottom:8px;
+  }
+  .progress-fill {
+    height:100%;
+    background:linear-gradient(90deg,var(--fire),var(--gold));
+    border-radius:3px;
+    transition:width 1s linear;
+    box-shadow:0 0 8px rgba(255,208,0,.4);
+  }
+  .progress-lbl {
+    font-family:'Nunito', sans-serif;
+    font-weight:700;
+    font-size:11px; color:#333;
+    letter-spacing:2px; text-align:center;
+    text-transform:uppercase; margin-bottom:32px;
+  }
+
+  .lineup {
+    font-family:'Nunito', sans-serif;
+    font-weight:700;
+    font-size:12px; letter-spacing:2px;
+    color:#2e2e2e; text-align:center;
+    max-width:540px; line-height:2;
+    text-transform:uppercase;
+  }
+
+  .arrived-msg {
+    display:none;
+    font-family:'Oswald', sans-serif;
+    font-weight:700;
+    font-size:clamp(52px,14vw,130px);
+    color:var(--gold); text-align:center;
+    text-shadow:5px 5px 0 var(--fire);
+    animation:arrivep .5s ease infinite alternate;
+  }
+  @keyframes arrivep { 0%{transform:scale(1) rotate(-2deg)} 100%{transform:scale(1.05) rotate(2deg)} }
+
+  @media(max-width:480px){
+    .sep{display:none}
+    .countdown-grid{gap:6px}
+  }
+</style>
+</head>
+<body>
+
+<div class="beams">
+  <div class="beam"></div><div class="beam"></div><div class="beam"></div>
+  <div class="beam"></div><div class="beam"></div>
+</div>
+<div class="emoji-rain" id="emojiRain"></div>
+
+<div class="container">
+
+  <div class="badge">🎸 Hradec Králové &bull; 10–14. 6. 2026 🎸</div>
+
+  <div class="headline">
+    <span class="decko">Déčko</span>
+    <span class="na">na</span>
+    <span class="rokaci">Rokači</span>
+  </div>
+
+  <div class="za">za:</div>
+
+  <div class="countdown-grid" id="countdown">
+    <div class="unit">
+      <div class="box"><span class="num" id="days">00</span></div>
+      <div class="lbl">Dní</div>
+    </div>
+    <div class="sep">:</div>
+    <div class="unit">
+      <div class="box"><span class="num" id="hours">00</span></div>
+      <div class="lbl">Hodin</div>
+    </div>
+    <div class="sep">:</div>
+    <div class="unit">
+      <div class="box"><span class="num" id="minutes">00</span></div>
+      <div class="lbl">Minut</div>
+    </div>
+    <div class="sep">:</div>
+    <div class="unit">
+      <div class="box"><span class="num" id="seconds">00</span></div>
+      <div class="lbl">Vteřin</div>
+    </div>
+  </div>
+
+  <div class="arrived-msg" id="arrivedMsg">JE TU!!! 🤘🔥🤘</div>
+
+  <div class="fun-msg" id="funMsg">😅 Ještě chvilku vydržíš...</div>
+
+  <div class="medicalc-box">
+    <div class="medicalc-tag">📋 prioritní oznámení</div>
+    <div class="medicalc-text">
+      <strong>Medicalc pár dní počká.</strong> 😂<br>
+      Některý pull request je méně důležitý než Iron Maiden.
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+  </div>
+  <div class="progress-lbl" id="progressLbl">Počítáme dny...</div>
+
+  <div class="lineup">
+    🎵 Gorillaz · Iron Maiden · Limp Bizkit · Bring Me The Horizon<br>
+    Halsey · Breaking Benjamin · Electric Callboy · Babymetal + 150 dalších
+  </div>
+
+</div>
+
+<script>
+  const TARGET = new Date('2026-06-10T12:00:00');
+  const START  = new Date('2025-09-01T00:00:00');
+
+  const msgs = [
+    "😅 Ještě chvilku vydržíš...",
+    "🎸 Procvičuj air guitar, ať jsi ready",
+    "🤘 Prst bolí? To nic, bude hůř v moshi",
+    "😴 Spi, čas poběží rychleji. Nebo ne.",
+    "🏕️ Zkontroloval jsi stan? A spacák?",
+    "🧴 Nezapomeň na opalovací krém. Budeš litovat.",
+    "🎵 Iron Maiden posloucháš nebo se modlíš?",
+    "📱 Nabij powerbanku. Jo teď.",
+    "🌧️ Pláštěnka? Festivalové počasí = vždy déšť",
+    "🍕 Festivalové jídlo: drahé jako Pražský hrad",
+    "😭 Ještě ani nekoupil lístek?? Panika! 🚨",
+    "🤘 Gorillaz! GORILLAZ! GORILLAAAAAZ!",
+    "⚡ Electric Callboy = největší sranda na hlavní scéně",
+    "🎯 Cíl: přežít 5 dní. Strategie: káva + káva + káva",
+    "😂 Medicalc počká. Rokač nepočká.",
+    "💀 BABYMETAL umí víc než tvůj celý backlog",
+    "🎤 Každý den bez RFP je zbytečně strávený den",
+    "😂 Medicalc bug report: 'uživatel odjel na festival'",
+    "🔥 Tuhle dobu za rok budeš v moshi. Bude to SKVĚLÉ.",
+    "🎸 Naučil ses text aspoň jedné písničky? Jé.",
+  ];
+
+  const emojiPool = ['🤘','🎸','🔥','🎵','💀','⚡','🥁','🎤','🤯','💥','🎶','🦇'];
+
+  let msgIdx = Math.floor(Math.random() * msgs.length);
+  let lastSec = -1;
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+
+  function tick(id){
+    const el = document.getElementById(id);
+    el.classList.remove('tick');
+    void el.offsetWidth;
+    el.classList.add('tick');
+  }
+
+  function update(){
+    const now  = new Date();
+    const diff = TARGET - now;
+
+    if(diff <= 0){
+      document.getElementById('countdown').style.display = 'none';
+      document.getElementById('arrivedMsg').style.display = 'block';
+      document.getElementById('funMsg').textContent = '🔥 RFP JE TADY! JDI TAM! 🤘';
+      rain(25); return;
+    }
+
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000)  / 60000);
+    const s = Math.floor((diff % 60000)    / 1000);
+
+    document.getElementById('days').textContent    = pad(d);
+    document.getElementById('hours').textContent   = pad(h);
+    document.getElementById('minutes').textContent = pad(m);
+    document.getElementById('seconds').textContent = pad(s);
+
+    if(s !== lastSec){
+      tick('seconds'); lastSec = s;
+      if(s===0) tick('minutes');
+      if(s===0&&m===0) tick('hours');
+      if(s===0&&m===0&&h===0) tick('days');
+      if(Math.random() < 0.12) rain(1);
+    }
+
+    const total   = TARGET - START;
+    const elapsed = now - START;
+    const pct     = Math.min(100, Math.max(0, elapsed/total*100));
+    document.getElementById('progressFill').style.width = pct.toFixed(2)+'%';
+    document.getElementById('progressLbl').textContent =
+      'Odpočítáváme už ' + Math.floor(elapsed/86400000) + ' dní  ·  ' + pct.toFixed(1) + '% hotovo';
+  }
+
+  function rotateMsg(){
+    const el = document.getElementById('funMsg');
+    el.style.opacity = '0';
+    setTimeout(()=>{
+      msgIdx = (msgIdx+1) % msgs.length;
+      el.textContent = msgs[msgIdx];
+      el.style.opacity = '1';
+    }, 400);
+  }
+
+  function rain(count){
+    const wrap = document.getElementById('emojiRain');
+    for(let i=0;i<count;i++){
+      const em = document.createElement('span');
+      em.className = 'falling-emoji';
+      em.textContent = emojiPool[Math.floor(Math.random()*emojiPool.length)];
+      em.style.left = Math.random()*100+'vw';
+      em.style.fontSize = (16+Math.random()*22)+'px';
+      em.style.animationDuration = (2+Math.random()*4)+'s';
+      em.style.animationDelay   = (Math.random()*.8)+'s';
+      wrap.appendChild(em);
+      setTimeout(()=>em.remove(), 6000);
+    }
+  }
+
+  update();
+  setInterval(update, 1000);
+  setInterval(rotateMsg, 5000);
+  setTimeout(()=>rain(10), 600);
+</script>
+</body>
+</html>
